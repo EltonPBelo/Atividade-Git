@@ -103,7 +103,7 @@
         class="carousel"
         aria-label="Carrossel Neymar por clubes"
         aria-live="polite"
-        aria-roledescription="carrossel"
+        aria-roledescription="carousel"
         tabindex="0"
       >
         <article class="slide active" role="group" aria-roledescription="slide">
@@ -161,6 +161,7 @@
         slides.forEach((slide, index) => {
           const caption = slide.querySelector('.caption')?.textContent || '';
           slide.setAttribute('aria-label', `${index + 1} de ${slides.length}: ${caption}`);
+          slide.setAttribute('aria-hidden', index === current ? 'false' : 'true');
         });
         const activeCaption = slides[current].querySelector('.caption')?.textContent || '';
         slideStatus.textContent = `Slide ${current + 1} de ${slides.length}: ${activeCaption}`;
@@ -207,9 +208,11 @@
       carousel.addEventListener('focusout', startAutoPlay);
       carousel.addEventListener('keydown', (event) => {
         if (event.key === 'ArrowLeft') {
+          event.preventDefault();
           showSlide(current - 1);
         }
         if (event.key === 'ArrowRight') {
+          event.preventDefault();
           showSlide(current + 1);
         }
       });
