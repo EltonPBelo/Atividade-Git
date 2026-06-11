@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neymidia</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Neymidia</h1>
+      <p>Carrossel de fotos do Neymar em todos os clubes que ele já jogou.</p>
+
+      <section
+        class="carousel"
+        aria-label="Carrossel Neymar por clubes"
+        aria-live="polite"
+        aria-roledescription="carousel"
+        tabindex="0"
+      >
+        <article class="slide active" role="group" aria-roledescription="slide">
+          <img
+            src="https://lncimg.lance.com.br/uploads/2025/01/Neymar-Santos-2-scaled-aspect-ratio-512-320.jpg"
+            alt="Neymar no Santos"
+          />
+          <p class="caption">Santos</p>
+        </article>
+        <article class="slide" role="group" aria-roledescription="slide">
+          <img
+            src="https://i.guim.co.uk/img/media/365e871f85c366235b5a797e1690f2a429f74d26/52_20_1220_732/master/1220.jpg?width=1200&height=900&quality=85&auto=format&fit=crop&s=973a01e17c302729c995021abebecbc4"
+            alt="Neymar no Barcelona"
+          />
+          <p class="caption">Barcelona</p>
+        </article>
+        <article class="slide" role="group" aria-roledescription="slide">
+          <img
+            src="https://assets.goal.com/images/v3/blt4891aee65a59fda6/a8189eafd265767fe6161eb9fddcff13d61e8238.jpg?auto=webp&format=pjpg&width=3840&quality=60"
+            alt="Neymar no Paris Saint-Germain"
+          />
+          <p class="caption">Paris Saint-Germain</p>
+        </article>
+        <article class="slide" role="group" aria-roledescription="slide">
+          <img
+            src="https://s2-oglobo.glbimg.com/ff94GlkXv40JxFIQPk-juZoGsmM=/0x0:5244x3496/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2024/k/k/N0njvJRVGRGBEvHSTswQ/108889298-hilals-brazilian-forward-10-neymar-runs-on-the-pitch-during-the-afc-champions-league.jpg"
+            alt="Neymar no Al Hilal"
+          />
+          <p class="caption">Al Hilal</p>
+        </article>
+
+
+         <article class="slide" role="group" aria-roledescription="slide">
+          <img
+            src="https://assets.goal.com/images/v3/blta48e3bbb2f5a960f/GettyImages-1446977379.jpg?auto=webp&format=pjpg&width=3840&quality=60"
+            alt="Neymar na selecão brasileira"
+          />
+          <p class="caption">Seleção Brasileira</p>
+        </article>
+
+      </section>
+
+      <div class="controls">
+        <button id="prev" type="button" aria-label="Slide anterior">Anterior</button>
+        <button id="next" type="button" aria-label="Próximo slide">Próximo</button>
+        <button id="toggleAutoplay" type="button" aria-label="Pausar autoplay">
+          Pausar autoplay
+        </button>
+      </div>
+      <p id="slideStatus" class="sr-only" aria-live="polite"></p>
+    </main>
+
+    <script>
+      const carousel = document.querySelector('.carousel');
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const prevButton = document.getElementById('prev');
+      const nextButton = document.getElementById('next');
+      const autoplayButton = document.getElementById('toggleAutoplay');
+      const slideStatus = document.getElementById('slideStatus');
+      let current = 0;
+      let autoPlayId = null;
+      let userPaused = false;
+
+      function updateSlideA11y() {
+        slides.forEach((slide, index) => {
+          const caption = slide.querySelector('.caption')?.textContent || '';
+          slide.setAttribute('aria-label', `${index + 1} de ${slides.length}: ${caption}`);
+          slide.setAttribute('aria-hidden', index === current ? 'false' : 'true');
+        });
+        const activeCaption = slides[current].querySelector('.caption')?.textContent || '';
+        slideStatus.textContent = `Slide ${current + 1} de ${slides.length}: ${activeCaption}`;
+      }
+
+      function showSlide(index) {
+        slides[current].classList.remove('active');
+        current = (index + slides.length) % slides.length;
+        slides[current].classList.add('active');
+        updateSlideA11y();
+      }
+
+      prevButton.addEventListener('click', () => showSlide(current - 1));
+      nextButton.addEventListener('click', () => showSlide(current + 1));
+      autoplayButton.addEventListener('click', () => {
+        userPaused = !userPaused;
+        autoplayButton.textContent = userPaused ? 'Retomar autoplay' : 'Pausar autoplay';
+        autoplayButton.setAttribute(
+          'aria-label',
+          userPaused ? 'Retomar autoplay' : 'Pausar autoplay'
+        );
+        if (userPaused) {
+          stopAutoPlay();
+        } else {
+          startAutoPlay();
+        }
+      });
+
+      function startAutoPlay() {
+        if (userPaused) return;
+        if (autoPlayId !== null) return;
+        autoPlayId = setInterval(() => showSlide(current + 1), 4000);
+      }
+
+      function stopAutoPlay() {
+        if (autoPlayId === null) return;
+        clearInterval(autoPlayId);
+        autoPlayId = null;
+      }
+
+      carousel.addEventListener('mouseenter', stopAutoPlay);
+      carousel.addEventListener('mouseleave', startAutoPlay);
+      carousel.addEventListener('focusin', stopAutoPlay);
+      carousel.addEventListener('focusout', startAutoPlay);
+      carousel.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          showSlide(current - 1);
+        }
+        if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          showSlide(current + 1);
+        }
+      });
+
+      updateSlideA11y();
+      startAutoPlay();
+    </script>
+  </body>
+</html>
