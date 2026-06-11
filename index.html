@@ -58,6 +58,7 @@
         justify-content: center;
         gap: 12px;
         margin-top: 12px;
+        flex-wrap: wrap;
       }
 
       button {
@@ -72,6 +73,18 @@
 
       button:hover {
         transform: translateY(-1px);
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
       }
 
       @media (max-width: 640px) {
@@ -90,29 +103,31 @@
         class="carousel"
         aria-label="Carrossel Neymar por clubes"
         aria-live="polite"
+        aria-roledescription="carousel"
+        tabindex="0"
       >
-        <article class="slide active">
+        <article class="slide active" role="group" aria-roledescription="slide">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Neymar_-_Santos_FC_%28cropped%29.jpg"
             alt="Neymar no Santos"
           />
           <p class="caption">Santos</p>
         </article>
-        <article class="slide">
+        <article class="slide" role="group" aria-roledescription="slide">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/2/23/Neymar_2013.jpg"
             alt="Neymar no Barcelona"
           />
           <p class="caption">Barcelona</p>
         </article>
-        <article class="slide">
+        <article class="slide" role="group" aria-roledescription="slide">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/8/89/Neymar_PSG.jpg"
             alt="Neymar no Paris Saint-Germain"
           />
           <p class="caption">Paris Saint-Germain</p>
         </article>
-        <article class="slide">
+        <article class="slide" role="group" aria-roledescription="slide">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/4/44/Neymar_Al_Hilal.jpg"
             alt="Neymar no Al Hilal"
@@ -122,9 +137,13 @@
       </section>
 
       <div class="controls">
-        <button id="prev" type="button">Anterior</button>
-        <button id="next" type="button">Próxima</button>
+        <button id="prev" type="button" aria-label="Slide anterior">Anterior</button>
+        <button id="next" type="button" aria-label="Próxima slide">Próxima</button>
+        <button id="toggleAutoplay" type="button" aria-label="Pausar autoplay">
+          Pausar autoplay
+        </button>
       </div>
+      <p id="slideStatus" class="sr-only" aria-live="polite"></p>
     </main>
 
     <script>
@@ -132,19 +151,46 @@
       const slides = Array.from(document.querySelectorAll('.slide'));
       const prevButton = document.getElementById('prev');
       const nextButton = document.getElementById('next');
+      const autoplayButton = document.getElementById('toggleAutoplay');
+      const slideStatus = document.getElementById('slideStatus');
       let current = 0;
       let autoPlayId = null;
+      let userPaused = false;
+
+      function updateSlideA11y() {
+        slides.forEach((slide, index) => {
+          const caption = slide.querySelector('.caption')?.textContent || '';
+          slide.setAttribute('aria-label', `${index + 1} de ${slides.length}: ${caption}`);
+        });
+        const activeCaption = slides[current].querySelector('.caption')?.textContent || '';
+        slideStatus.textContent = `Slide ${current + 1} de ${slides.length}: ${activeCaption}`;
+      }
 
       function showSlide(index) {
         slides[current].classList.remove('active');
         current = (index + slides.length) % slides.length;
         slides[current].classList.add('active');
+        updateSlideA11y();
       }
 
       prevButton.addEventListener('click', () => showSlide(current - 1));
       nextButton.addEventListener('click', () => showSlide(current + 1));
+      autoplayButton.addEventListener('click', () => {
+        userPaused = !userPaused;
+        autoplayButton.textContent = userPaused ? 'Retomar autoplay' : 'Pausar autoplay';
+        autoplayButton.setAttribute(
+          'aria-label',
+          userPaused ? 'Retomar autoplay' : 'Pausar autoplay'
+        );
+        if (userPaused) {
+          stopAutoPlay();
+        } else {
+          startAutoPlay();
+        }
+      });
 
       function startAutoPlay() {
+        if (userPaused) return;
         if (autoPlayId !== null) return;
         autoPlayId = setInterval(() => showSlide(current + 1), 4000);
       }
@@ -159,7 +205,16 @@
       carousel.addEventListener('mouseleave', startAutoPlay);
       carousel.addEventListener('focusin', stopAutoPlay);
       carousel.addEventListener('focusout', startAutoPlay);
+      carousel.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') {
+          showSlide(current - 1);
+        }
+        if (event.key === 'ArrowRight') {
+          showSlide(current + 1);
+        }
+      });
 
+      updateSlideA11y();
       startAutoPlay();
     </script>
   </body>
