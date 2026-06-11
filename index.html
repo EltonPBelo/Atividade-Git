@@ -4,9 +4,135 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Neymidia</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f4f4f4;
+        color: #111;
+      }
+
+      main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+        text-align: center;
+      }
+
+      h1 {
+        margin-bottom: 8px;
+      }
+
+      .carousel {
+        position: relative;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+      }
+
+      .slide {
+        display: none;
+      }
+
+      .slide.active {
+        display: block;
+      }
+
+      .slide img {
+        width: 100%;
+        height: 460px;
+        object-fit: cover;
+        display: block;
+      }
+
+      .caption {
+        margin: 0;
+        padding: 12px;
+        background: #111;
+        color: #fff;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      @media (max-width: 640px) {
+        .slide img {
+          height: 280px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>Neymidia</h1>
-    <p>Carrossel de fotos do Neymar em todos os clubes que ele já jogou.</p>
+    <main>
+      <h1>Neymidia</h1>
+      <p>Carrossel de fotos do Neymar em todos os clubes que ele já jogou.</p>
+
+      <section class="carousel" aria-label="Carrossel Neymar por clubes">
+        <article class="slide active">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Neymar_-_Santos_FC_%28cropped%29.jpg"
+            alt="Neymar no Santos"
+          />
+          <p class="caption">Santos</p>
+        </article>
+        <article class="slide">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/2/23/Neymar_2013.jpg"
+            alt="Neymar no Barcelona"
+          />
+          <p class="caption">Barcelona</p>
+        </article>
+        <article class="slide">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/8/89/Neymar_PSG.jpg"
+            alt="Neymar no Paris Saint-Germain"
+          />
+          <p class="caption">Paris Saint-Germain</p>
+        </article>
+        <article class="slide">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/4/44/Neymar_Al_Hilal.jpg"
+            alt="Neymar no Al Hilal"
+          />
+          <p class="caption">Al Hilal</p>
+        </article>
+      </section>
+
+      <div class="controls">
+        <button id="prev" type="button">Anterior</button>
+        <button id="next" type="button">Próxima</button>
+      </div>
+    </main>
+
+    <script>
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const prevButton = document.getElementById('prev');
+      const nextButton = document.getElementById('next');
+      let current = 0;
+
+      function showSlide(index) {
+        slides[current].classList.remove('active');
+        current = (index + slides.length) % slides.length;
+        slides[current].classList.add('active');
+      }
+
+      prevButton.addEventListener('click', () => showSlide(current - 1));
+      nextButton.addEventListener('click', () => showSlide(current + 1));
+
+      setInterval(() => showSlide(current + 1), 4000);
+    </script>
   </body>
 </html>
