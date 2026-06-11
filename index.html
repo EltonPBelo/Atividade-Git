@@ -86,7 +86,11 @@
       <h1>Neymidia</h1>
       <p>Carrossel de fotos do Neymar em todos os clubes que ele já jogou.</p>
 
-      <section class="carousel" aria-label="Carrossel Neymar por clubes">
+      <section
+        class="carousel"
+        aria-label="Carrossel Neymar por clubes"
+        aria-live="polite"
+      >
         <article class="slide active">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Neymar_-_Santos_FC_%28cropped%29.jpg"
@@ -124,10 +128,12 @@
     </main>
 
     <script>
+      const carousel = document.querySelector('.carousel');
       const slides = Array.from(document.querySelectorAll('.slide'));
       const prevButton = document.getElementById('prev');
       const nextButton = document.getElementById('next');
       let current = 0;
+      let autoPlayId = null;
 
       function showSlide(index) {
         slides[current].classList.remove('active');
@@ -138,7 +144,23 @@
       prevButton.addEventListener('click', () => showSlide(current - 1));
       nextButton.addEventListener('click', () => showSlide(current + 1));
 
-      setInterval(() => showSlide(current + 1), 4000);
+      function startAutoPlay() {
+        if (autoPlayId !== null) return;
+        autoPlayId = setInterval(() => showSlide(current + 1), 4000);
+      }
+
+      function stopAutoPlay() {
+        if (autoPlayId === null) return;
+        clearInterval(autoPlayId);
+        autoPlayId = null;
+      }
+
+      carousel.addEventListener('mouseenter', stopAutoPlay);
+      carousel.addEventListener('mouseleave', startAutoPlay);
+      carousel.addEventListener('focusin', stopAutoPlay);
+      carousel.addEventListener('focusout', startAutoPlay);
+
+      startAutoPlay();
     </script>
   </body>
 </html>
